@@ -6,5 +6,5 @@ Rails.application.routes.draw do
 
   get '/forex', to: 'forex#index'
   get '/forex/pair', to: 'forex#get_currency_pair'
-  #get '/forex/pairs/:pairs/:how_much', to: 'forex#show_pairs'
+  get '/forex/convert', to: 'forex#convert'
 end
