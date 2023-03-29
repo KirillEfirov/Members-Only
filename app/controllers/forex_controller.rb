@@ -6,7 +6,7 @@ class ForexController < ApplicationController
   end
 
   def get_currency_pair
-    pair = params[:pair]
+    pair = params[:pairs]
     response = get_http_response("https://www.freeforexapi.com/api/live?pairs=#{pair}")
 
     render json: response.body
