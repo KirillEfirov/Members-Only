@@ -1,13 +1,25 @@
 class ForexController < ApplicationController
   def index
-    url = URI("https://www.freeforexapi.com/api/live")
-    http = Net::HTTP.new(url.host, url.port)
-    http.use_ssl = true
-    response = http.get(url)
+    response = get_http_response("https://www.freeforexapi.com/api/live")
 
     render json: response.body
   end
 
+  def get_currency_pair
+    pair = params[:pair]
+    response = get_http_response("https://www.freeforexapi.com/api/live?pairs=#{pair}")
+
+    render json: response.body
+  end
+
+  private
+
+  def get_http_response(remote_url)
+    url = URI(remote_url)
+    http = Net::HTTP.new(url.host, url.port)
+    http.use_ssl = true
+    http.get(url)
+  end
 end
 
 
