@@ -25,20 +25,19 @@ class ForexController < ApplicationController
     end
   end
 
-  def convert
-    pair = params[:pairs]
-    amount = params[:amount]
+def convert
+  from = params[:from]
+  to = params[:to]
+  amount = params[:amount]
+  pair = from + to
 
-    response = get_http_response("https://www.freeforexapi.com/api/live?pairs=#{pair}")
-    currency = JSON.parse(response.body)
+  response = get_http_response("https://www.freeforexapi.com/api/live?pairs=#{pair}")
+  currency = JSON.parse(response.body)
 
-    if currency["rates"].nil?
-      render json: { error: "Currency is not found" }, status: :not_found
-    else
-      currency_rate = currency["rates"]["#{pair}"]["rate"]
-      render json: convert_currency(amount, currency_rate)
-    end
-  end
+  rate = currency["rates"]["#{pair}"]["rate"]
+
+  render json: "#{amount} #{pair[0..2]} = #{convert_currency(amount, rate)} #{pair[3..5]}\nrate: #{currency["rates"]["#{pair}"]["rate"]}"
+end
 
   private
 
@@ -63,7 +62,6 @@ class ForexController < ApplicationController
       if currency_pair["rates"].nil?
         render json: { error: "Currency is not found" }, status: :not_found
       else
-        currency ||= Currency.new(pair: pair_param)
         currency.update!(rate: currency_pair["rates"][pair_param]["rate"])
         render json: currency_pair
       end
