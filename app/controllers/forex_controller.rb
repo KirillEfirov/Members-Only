@@ -27,11 +27,11 @@ class ForexController < ApplicationController
 
   def convert
     pair = params[:pairs]
+    amount = params[:amount]
 
     response = get_http_response("https://www.freeforexapi.com/api/live?pairs=#{pair}")
     json = JSON.parse(response.body)
 
-    amount = params[:amount]
     currency_rate = json["rates"]["#{pair}"]["rate"]
 
     render json: convert_currency(amount, currency_rate)
@@ -56,13 +56,13 @@ class ForexController < ApplicationController
     if my_object && my_object.created_at >= 1.hour.ago
       render json: Currency.where(pair: params[:pairs])
     else
-      response = get_http_response("https://www.freeforexapi.com/api/live?pairs=#{pair}")
+      response = get_http_response("https://www.freeforexapi.com/api/live?pairs=#{params[:pairs]}")
       currency_pair = JSON.parse(response.body)
 
       if currency_pair["rates"].nil?
         render json: "Currency doesn't exist"
       else
-        currency_to_db = Currency.update(rate: currency_pair["rates"]["#{pair}"]["rate"])
+        currency_to_db = Currency.update!(rate: currency_pair["rates"]["#{pair}"]["rate"])
         render json: currency_pair
       end
     end
