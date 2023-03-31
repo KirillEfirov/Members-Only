@@ -1,8 +1,8 @@
 class ForexConverter
-    def initialize(params)
-      @from = params[:from]
-      @to = params[:to]
-      @amount = params[:amount]
+    def initialize(from, to, amount)
+      @from = from
+      @to = to
+      @amount = amount
     end
   
     def convert

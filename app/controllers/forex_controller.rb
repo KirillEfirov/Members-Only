@@ -9,6 +9,6 @@ class ForexController < ApplicationController
   end
 
   def convert
-    render json: ForexConverter.new(params).convert
+    render json: ForexConverter.new(params[:from], params[:to], params[:amount]).convert
   end
 end
