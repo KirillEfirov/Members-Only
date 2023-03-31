@@ -1,4 +1,6 @@
 class ForexPair
+  ERROR_MESSAGE = "Currency is not found"
+
   def initialize(params)
     pair = params
   end
@@ -19,7 +21,7 @@ class ForexPair
       currency_pair = get_currency_from_api(pair, "https://www.freeforexapi.com/api/live?pairs=#{pair}")
 
       if currency_pair["rates"].nil?
-        "Currency is not found"
+        ForexPair::ERROR_MESSAGE
       else
         save_currency(pair, currency_pair["rates"]["#{pair}"]["rate"])
         get_currency_from_db(pair)
