@@ -3,6 +3,7 @@ class ForexController < ApplicationController
     @currency_pairs = ForexList.call
   end
 
+=begin 
   def show
     pair = params[:pairs]
 
@@ -20,6 +21,12 @@ class ForexController < ApplicationController
         render json: currency_pair
       end
     end
+  end
+=end
+
+  def show
+    forex_pair = ForexPair.new(params[:pairs])
+    render json: forex_pair.get_currency(params[:pairs])
   end
 
   def convert
