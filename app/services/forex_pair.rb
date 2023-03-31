@@ -11,15 +11,19 @@ class ForexPair
         get_currency_from_db(pair)
       else
         currency_pair = get_currency_from_api(pair, "https://www.freeforexapi.com/api/live?pairs=#{pair}")
-        need_to_update_currency = get_currency_from_db(pair)
-        update_currency(need_to_update_currency, currency_pair["rates"]["#{pair}"]["rate"])
-        need_to_update_currency
+        update_currency(get_currency_from_db(pair), currency_pair["rates"]["#{pair}"]["rate"])
+        get_currency_from_db(pair)
       end
 
     else
       currency_pair = get_currency_from_api(pair, "https://www.freeforexapi.com/api/live?pairs=#{pair}")
-      save_currency(pair, currency_pair["rates"]["#{pair}"]["rate"])
-      currency_pair
+
+      if currency_pair["rates"].nil?
+        "Currency is not found"
+      else
+        save_currency(pair, currency_pair["rates"]["#{pair}"]["rate"])
+        get_currency_from_db(pair)
+      end
     end
   end
 
