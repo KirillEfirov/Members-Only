@@ -5,7 +5,17 @@ class ForexPair
 
   def get_currency(pair)
     if currency_in_db?(pair)
-      get_currency_from_db(pair)
+      last_updation = find_last_updation(pair)
+      
+      if last_updation >= 1.hour.ago
+        get_currency_from_db(pair)
+      else
+        currency_pair = get_currency_from_api(pair, "https://www.freeforexapi.com/api/live?pairs=#{pair}")
+        need_to_update_currency = get_currency_from_db(pair)
+        update_currency(need_to_update_currency, currency_pair["rates"]["#{pair}"]["rate"])
+        need_to_update_currency
+      end
+
     else
       currency_pair = get_currency_from_api(pair, "https://www.freeforexapi.com/api/live?pairs=#{pair}")
       save_currency(pair, currency_pair["rates"]["#{pair}"]["rate"])
@@ -28,8 +38,17 @@ class ForexPair
     JSON.parse(response.body)
   end
 
+  def find_last_updation(currency_pair)
+    currency = get_currency_from_db(currency_pair)
+    currency.updated_at
+  end
+
   def save_currency(currency_pair, currency_rate)
     Currency.create(pair: currency_pair, rate: currency_rate)
+  end
+
+  def update_currency(currency_pair, currency_rate)
+    currency_pair.update(rate: currency_rate)
   end
 
   def get_http_response(remote_url)
