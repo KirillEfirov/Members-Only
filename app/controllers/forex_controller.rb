@@ -11,7 +11,7 @@ class ForexController < ApplicationController
   end
 
   def convert
-    conversion = fetch_conversion_data(params[:from], params[:to], params[:amount]).convert
+    conversion = fetch_conversion_data(params[:from], params[:to], params[:amount])
 
     conversion[:error] ? flash[:error] = conversion[:error] : @conversion = conversion[:conversion]
   end
