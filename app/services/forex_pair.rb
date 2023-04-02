@@ -10,21 +10,21 @@ class ForexPair
       last_updation = find_last_updation(pair)
       
       if last_updation >= 1.hour.ago
-        get_currency_from_db(pair)
+        { currency: get_currency_from_db(pair) }
       else
         currency_pair = get_currency_from_api(pair, "https://www.freeforexapi.com/api/live?pairs=#{pair}")
         update_currency(get_currency_from_db(pair), currency_pair["rates"]["#{pair}"]["rate"])
-        get_currency_from_db(pair)
+        { currency: get_currency_from_db(pair) }
       end
 
     else
       currency_pair = get_currency_from_api(pair, "https://www.freeforexapi.com/api/live?pairs=#{pair}")
 
       if currency_pair["rates"].nil?
-        ForexPair::ERROR_MESSAGE
+        { error: ForexPair::ERROR_MESSAGE }
       else
         save_currency(pair, currency_pair["rates"]["#{pair}"]["rate"])
-        get_currency_from_db(pair)
+        { currency: get_currency_from_db(pair) }
       end
     end
   end
