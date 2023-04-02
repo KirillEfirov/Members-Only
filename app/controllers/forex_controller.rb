@@ -4,11 +4,24 @@ class ForexController < ApplicationController
   end
 
   def show
-    forex_pair = ForexPair.new(params[:pairs])
-    render json: forex_pair.get_currency(params[:pairs])
+    @pair = params[:pairs]
+    forex_pair = ForexPair.new(@pair)
+    currency_data = forex_pair.get_currency(@pair)
+
+    if currency_data[:error]
+      flash[:error] = currency_data[:error]
+    else
+      @currency = currency_data[:currency]
+    end
   end
 
   def convert
-    render json: ForexConverter.new(params[:from], params[:to], params[:amount]).convert
+    conversion = ForexConverter.new(params[:from], params[:to], params[:amount]).convert
+
+    if conversion[:error]
+      flash[:error] = conversion[:error]
+    else
+      @conversion = conversion[:conversion]
+    end
   end
 end
