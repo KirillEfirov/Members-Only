@@ -5,23 +5,24 @@ class ForexController < ApplicationController
 
   def show
     @pair = params[:pairs]
-    forex_pair = ForexPair.new(@pair)
-    currency_data = forex_pair.get_currency(@pair)
+    currency_data = fetch_currency_data(@pair)
 
-    if currency_data[:error]
-      flash[:error] = currency_data[:error]
-    else
-      @currency = currency_data[:currency]
-    end
+    currency_data[:error] ? flash[:error] = currency_data[:error] : @currency = currency_data[:currency]
   end
 
   def convert
-    conversion = ForexConverter.new(params[:from], params[:to], params[:amount]).convert
+    conversion = fetch_conversion_data(params[:from], params[:to], params[:amount]).convert
 
-    if conversion[:error]
-      flash[:error] = conversion[:error]
-    else
-      @conversion = conversion[:conversion]
-    end
+    conversion[:error] ? flash[:error] = conversion[:error] : @conversion = conversion[:conversion]
+  end
+
+  private
+
+  def fetch_currency_data(pair)
+    ForexPair.new(pair).get_currency
+  end
+
+  def fetch_conversion_data(from, to, amount)
+    ForexConverter.new(from, to, amount).convert
   end
 end
