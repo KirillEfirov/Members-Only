@@ -1,0 +1,9 @@
+<h1>Currency pair: <%= @pair %></h1>
+
+<% if flash[:error] %>
+  <p><%= flash[:error] %></p>
+<% else %>
+  <p>Current rate: <%= @currency.rate %></p>  
+<% end %>
+
+<%= link_to 'Back', root_path %>
