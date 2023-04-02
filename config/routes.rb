@@ -7,4 +7,6 @@ Rails.application.routes.draw do
   get '/forex', to: 'forex#index'
   get '/forex/pair', to: 'forex#show'
   get '/forex/convert', to: 'forex#convert'
+
+  get '*path', to: 'application#render_404'
 end
