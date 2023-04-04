@@ -6,7 +6,7 @@ class ForexConverter
   end
   
   def convert
-    pair = @from + @to
+    pair = @from.to_s + @to.to_s
     currency = ForexPair.new(pair).get_currency
 
     if(currency == currency[:error] || currency[:currency].nil?)

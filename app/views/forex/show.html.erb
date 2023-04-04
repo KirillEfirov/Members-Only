@@ -7,4 +7,4 @@
 <% end %>
 
 <%= link_to 'Back', root_path %>
-<%= link_to 'Convert', "/forex/convert?from=#{@pair[0..2]}&to=#{@pair[3..5]}&amount=1" %>
+<%= link_to 'Convert', "/forex/convert?from=#{@pair.to_s[0..2]}&to=#{@pair.to_s[3..5]}&amount=1" %>
