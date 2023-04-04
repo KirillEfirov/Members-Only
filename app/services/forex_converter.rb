@@ -1,4 +1,6 @@
 class ForexConverter
+  ERROR_MESSAGE = "Can't convert currency"
+
   def initialize(from, to, amount)
     @from = from
     @to = to
@@ -10,7 +12,7 @@ class ForexConverter
     currency = ForexPair.new(pair).get_currency
 
     if(currency == currency[:error] || currency[:currency].nil?)
-      { error: "Can't convert from #{@from} to #{@to}" }
+      { error: ForexConverter::ERROR_MESSAGE }
     else
       { conversion: convert_currency(@amount, currency[:currency].rate) }
     end
