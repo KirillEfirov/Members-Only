@@ -1,12 +1,14 @@
 Rails.application.routes.draw do
   devise_for :users
 
-  root to: "forex#index"
-  resources :posts, only: [:new, :create, :index]
+  root to: 'forex#index'
+  resources :posts, only: %i[new create index]
 
-  get '/forex', to: 'forex#index'
-  get '/forex/pair', to: 'forex#show'
-  get '/forex/convert', to: 'forex#convert'
+  scope :forex do
+    get '/', to: 'forex#index'
+    get '/pair', to: 'forex#show'
+    get '/convert', to: 'forex#convert'
+  end
 
   get '*path', to: 'application#render_404'
 end
