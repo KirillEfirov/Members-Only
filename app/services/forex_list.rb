@@ -1,20 +1,23 @@
+# frozen_string_literal: true
+
 class ForexList
-  def self.call
-    supported_pairs
-  end
+  API_URL = 'https://www.freeforexapi.com/api/live'
+  PAIRS_KEY = 'supportedPairs'
 
-  private
+  class << self
+    def call
+      response = get_http_response(ForexList::API_URL)
+      currencies = JSON.parse(response.body)
+      currencies[ForexList::PAIRS_KEY]
+    end
 
-  def self.supported_pairs
-    response = self.get_http_response("https://www.freeforexapi.com/api/live")
-    currencies = JSON.parse(response.body)
-    currencies["supportedPairs"]
-  end
+    private
 
-  def self.get_http_response(remote_url)
-    url = URI(remote_url)
-    http = Net::HTTP.new(url.host, url.port)
-    http.use_ssl = true
-    http.get(url)
+    def get_http_response(remote_url)
+      url = URI(remote_url)
+      http = Net::HTTP.new(url.host, url.port)
+      http.use_ssl = true
+      http.get(url)
+    end
   end
 end
