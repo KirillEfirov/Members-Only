@@ -1,4 +1,10 @@
+require_relative '../services/forex_service/forex_list'
+require_relative '../services/forex_service/forex_pair'
+require_relative '../services/forex_service/forex_converter'
+
 class ForexController < ApplicationController
+  include Forex
+
   def index
     @currency_pairs = ForexList.call
   end
