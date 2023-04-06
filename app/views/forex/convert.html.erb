@@ -5,7 +5,7 @@
 <% end %>
 
 <% if @conversion %>
-<%= form_tag forex_convert_url, method: :get do %>
+<%= form_tag convert_url, method: :get do %>
   <%= label_tag :from, 'From:' %>
   <%= text_field_tag :from, params[:from] %>
 
