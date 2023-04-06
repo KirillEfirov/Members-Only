@@ -1,59 +1,44 @@
+# frozen_string_literal: true
+
 class ForexPair
-  ERROR_MESSAGE = "Currency is not found"
-  API_URL = "https://www.freeforexapi.com/api/live"
+  ERROR_MESSAGE = 'Currency is not found'
+  API_URL = 'https://www.freeforexapi.com/api/live'
+  RATES = 'rates'
+  RATE = 'rate'
 
-  def initialize(params)
-    @pair = params
-  end
-
-  def get_currency
-    if currency_in_db?
-      last_updation = find_last_updation
-      
-      if last_updation >= 1.hour.ago
-        { currency: @currency }
+  class << self
+    def call(pair)
+      if Currency.where('updated_at >= ?', 1.hour.ago).find_by('pair = ?', pair).present?
+        get_currency_from_db(pair)
       else
-        currency_pair = get_currency_from_api(ForexPair::API_URL, { pairs: @pair })
-        update_currency(@currency, currency_pair["rates"][@pair]["rate"])
-        { currency: @currency }
-      end
-
-    else
-      currency_pair = get_currency_from_api(ForexPair::API_URL, { pairs: @pair })
-
-      if currency_pair["rates"].nil?
-        { error: ForexPair::ERROR_MESSAGE }
-      else
-        save_currency(@pair, currency_pair["rates"][@pair]["rate"])
-        { currency: @currency }
+        get_currency_from_api(ForexPair::API_URL, { pairs: pair }, pair)
       end
     end
-  end
 
-  private
+    private
 
-  def currency_in_db?
-    @currency ||= Currency.find_by(pair: @pair)
-  end
+    def get_currency_from_api(remote_url, params, pair)
+      url = URI(remote_url)
+      url.query = URI.encode_www_form(params)
+      currency_from_api = Net::HTTP.start(url.host, url.port, use_ssl: true) do |http|
+        response = http.get(url)
+        JSON.parse(response.body)
+      end
 
-  def find_last_updation
-    @currency.updated_at
-  end
+      if currency_from_api[ForexPair::RATES].nil?
+        { error: ForexPair::ERROR_MESSAGE }
+      else
+        save_currency(pair, currency_from_api[ForexPair::RATES][pair][ForexPair::RATE])
+        get_currency_from_db(pair)
+      end
+    end
 
-  def save_currency(currency_pair, currency_rate)
-    @currency = Currency.create(pair: currency_pair, rate: currency_rate)
-  end
+    def save_currency(currency_pair, currency_rate)
+      Currency.create(pair: currency_pair, rate: currency_rate)
+    end
 
-  def update_currency(currency_pair, currency_rate)
-    @currency.update(rate: currency_rate)
-  end
-
-  def get_currency_from_api(remote_url, params)
-    url = URI(remote_url)
-    url.query = URI.encode_www_form(params)
-    Net::HTTP.start(url.host, url.port, use_ssl: true) do |http|
-      response = http.get(url)
-      JSON.parse(response.body)
+    def get_currency_from_db(pair)
+      { currency: Currency.where('updated_at >= ?', 1.hour.ago).find_by('pair = ?', pair) }
     end
   end
 end
